@@ -1,0 +1,33 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/database/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ไม่ชัวร์เรื่อง enum ว่าต้องเพิ่มอะไรบ้าง
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  firstName String   @map("first_Name")
+  lastName  String   @map("last_Name")
+  dob       DateTime @db.Date
+  phone     String   @unique
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+}
+
+model Admin {
+  id        Int    @id @default(autoincrement())
+  email     String @unique
+  password  String
+  firstName String @map("first_Name")
+  lastName  String @map("last_Name")
+}
+
+//คิดไม่ออกแล้ววววว
