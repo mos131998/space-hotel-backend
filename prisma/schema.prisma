@@ -8,26 +8,52 @@ datasource db {
   provider = "postgresql"
 }
 
-// ไม่ชัวร์เรื่อง enum ว่าต้องเพิ่มอะไรบ้าง
+enum Role {
+  User
+  Admin
+}
 
 model User {
-  id        String   @id @default(uuid())
+  id        Int      @id @default(autoincrement())
   email     String   @unique
   password  String
   firstName String   @map("first_Name")
   lastName  String   @map("last_Name")
-  dob       DateTime @db.Date
-  phone     String   @unique
+  // dob       DateTime @db.Date
+  // phone     String   @unique
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz()
 }
 
-model Admin {
-  id        Int    @id @default(autoincrement())
-  email     String @unique
-  password  String
-  firstName String @map("first_Name")
-  lastName  String @map("last_Name")
+model Room {
+  id          Int      @id @default(autoincrement())
+  roomNumber  Int      @unique
+  price       Int
+  roomName    String
+  size        Int
+  maxAdult    String
+  maxChildren String
+  bathRoom    Boolean
+  bathTup     Boolean
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updated_At  DateTime @default(now()) @map("updated_at") @db.Timestamptz()
 }
 
-//คิดไม่ออกแล้ววววว
+model Booking {
+  id            Int      @id @default(autoincrement())
+  userId        Int
+  roomId        Int
+  checkIn       DateTime @default(now())
+  checkOut      DateTime @default(now())
+  paymentStatus String
+  slipUrl       String
+  created_At    DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updated_At    DateTime @default(now()) @map("updated_at") @db.Timestamptz()
+}
+
+model roomImages {
+  id     Int    @id @default(autoincrement())
+  roomId Int
+  url    String
+  order  String
+}
