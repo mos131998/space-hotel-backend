@@ -13,47 +13,61 @@ enum Role {
   Admin
 }
 
+enum PaymentStatus {
+  PENDING
+
+  APPROVED
+}
+
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
+  id        Int       @id @default(autoincrement())
+  role      Role
+  email     String    @unique
   password  String
-  firstName String   @map("first_Name")
-  lastName  String   @map("last_Name")
+  firstName String    @map("first_Name")
+  lastName  String    @map("last_Name")
   // dob       DateTime @db.Date
   // phone     String   @unique
-  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
-  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+  bookings  Booking[]
 }
 
 model Room {
-  id          Int      @id @default(autoincrement())
-  roomNumber  Int      @unique
+  id          Int          @id @default(autoincrement())
+  roomNumber  Int          @unique
   price       Int
   roomName    String
   size        Int
-  maxAdult    String
-  maxChildren String
+  maxAdult    Int
+  maxChildren Int
   bathRoom    Boolean
   bathTup     Boolean
-  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz()
-  updated_At  DateTime @default(now()) @map("updated_at") @db.Timestamptz()
-}
-
-model Booking {
-  id            Int      @id @default(autoincrement())
-  userId        Int
-  roomId        Int
-  checkIn       DateTime @default(now())
-  checkOut      DateTime @default(now())
-  paymentStatus String
-  slipUrl       String
-  created_At    DateTime @default(now()) @map("created_at") @db.Timestamptz()
-  updated_At    DateTime @default(now()) @map("updated_at") @db.Timestamptz()
+  createdAt   DateTime     @default(now()) @map("created_at") @db.Timestamptz()
+  updated_At  DateTime     @default(now()) @map("updated_at") @db.Timestamptz()
+  roomImages  roomImages[]
+  bookings    Booking[]
 }
 
 model roomImages {
   id     Int    @id @default(autoincrement())
   roomId Int
+  room   Room   @relation(fields: [roomId], references: [id], onDelete: Cascade)
   url    String
   order  String
+}
+
+model Booking {
+  id            Int           @id @default(autoincrement())
+  userId        Int
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  roomId        Int
+  room          Room          @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  checkIn       DateTime      @default(now())
+  checkOut      DateTime      @default(now())
+  paymentStatus PaymentStatus
+  total         Int
+  slipUrl       String
+  created_At    DateTime      @default(now()) @map("created_at") @db.Timestamptz()
+  updated_At    DateTime      @default(now()) @map("updated_at") @db.Timestamptz()
 }
