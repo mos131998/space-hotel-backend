@@ -4,12 +4,14 @@ import { UserService } from 'src/user/user.service';
 import { BcryptService } from 'src/shared/security/services/bcrypt.service';
 import { LoginDto } from './dtos/login.dto';
 import { User } from 'src/database/generated/prisma/client';
+import { AuthTokenService } from 'src/shared/security/services/auth-token.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UserService,
-    private readonly bcryptService: BcryptService
+    private readonly bcryptService: BcryptService,
+    private readonly authTokenService: AuthTokenService
   ) {}
 
   async register(registerDto: registerDto): Promise<void> {
@@ -34,7 +36,14 @@ export class AuthService {
         message: 'email or password is incorrect',
         code: 'INVALID_CREDENTIALS'
       });
-    const accessToken = 'xxx';
+    const accessToken = await this.authTokenService.sign({
+      sub: user.id,
+      email: user.email,
+      role: user.role,
+      firstName: user.firstName,
+      lastName: user.lastName
+    });
+
     return { accessToken, user };
   }
 }

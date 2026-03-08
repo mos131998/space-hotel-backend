@@ -1,7 +1,7 @@
 import { Role } from 'src/database/generated/prisma/enums';
 
 export type JwtPayload = {
-  sub: string;
+  sub: number;
   email: string;
   role: Role;
   iat?: number;
