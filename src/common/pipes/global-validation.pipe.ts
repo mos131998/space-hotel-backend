@@ -6,7 +6,7 @@ export class GlobalValidationPipe extends ValidationPipe {
       transform: true,
       whitelist: true,
       exceptionFactory(errors) {
-        console.log('errors', errors);
+        console.log(errors);
         const formattedErrors = errors.reduce<Record<string, string[]>>(
           (acc, el) => {
             if (el.constraints)

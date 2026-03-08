@@ -17,7 +17,7 @@ import { SecurityModule } from './shared/security/security.module';
     SecurityModule
   ],
 
-  providers: [UserService]
+  providers: [{ provide: APP_GUARD, useClass: AuthGuard }, UserService]
 })
 export class AppModule {}
-// { provide: APP_GUARD, useClass: AuthGuard },
+// { provide: APP_GUARD, useClass: AuthGuard }
