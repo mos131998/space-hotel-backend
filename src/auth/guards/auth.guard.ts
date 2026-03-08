@@ -33,6 +33,7 @@ export class AuthGuard implements CanActivate {
 
     try {
       const payload = await this.authTokenService.verify(token);
+      console.log(token);
       request.user = payload;
     } catch (error) {
       if (error instanceof Error && error.name === 'JsonWebTokenError')
