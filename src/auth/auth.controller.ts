@@ -1,4 +1,11 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Post
+} from '@nestjs/common';
 import { User } from 'src/database/generated/prisma/client';
 import { AuthService } from './auth.service';
 import { Public } from './decorators/public.decorator';
@@ -21,7 +28,10 @@ export class AuthController {
   @Post('login')
   async login(
     @Body() loginDto: LoginDto
-  ): Promise<{ accessToken: string; user: User }> {
+  ): Promise<{ accessToken: string; user: Omit<User, 'password'> }> {
     return this.authService.login(loginDto);
   }
+
+  @Get('me')
+  async getCurrentUser() {}
 }

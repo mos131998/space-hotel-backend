@@ -20,7 +20,7 @@ export class AuthService {
 
   async login(
     loginDto: LoginDto
-  ): Promise<{ accessToken: string; user: User }> {
+  ): Promise<{ accessToken: string; user: Omit<User, 'password'> }> {
     const user = await this.userService.findByEmail(loginDto.email);
     if (!user)
       throw new UnauthorizedException({
@@ -43,7 +43,7 @@ export class AuthService {
       firstName: user.firstName,
       lastName: user.lastName
     });
-
-    return { accessToken, user };
+    const { password, ...rest } = user;
+    return { accessToken, user: rest };
   }
 }
