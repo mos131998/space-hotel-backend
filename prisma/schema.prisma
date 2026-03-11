@@ -20,8 +20,8 @@ enum PaymentStatus {
 }
 
 model User {
-  id        Int       @id @default(autoincrement())
-  //เดี๋ยวให้พี่นน ดูพรุ่งนี้
+  id Int @id @default(autoincrement())
+
   role      Role      @default(User)
   email     String    @unique
   password  String

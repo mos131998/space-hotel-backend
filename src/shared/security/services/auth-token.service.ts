@@ -17,8 +17,8 @@ export class AuthTokenService {
     });
   }
 
-  verify(token: string): Promise<string> {
-    return this.jwtService.signAsync(token, {
+  verify(token: string): Promise<JwtPayload> {
+    return this.jwtService.verifyAsync(token, {
       secret: this.typedConfigService.get('JWT_SECRET')
     });
   }

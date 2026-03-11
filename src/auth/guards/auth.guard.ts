@@ -25,6 +25,7 @@ export class AuthGuard implements CanActivate {
     if (isPublic) return true;
     const request = context.switchToHttp().getRequest<Request>();
     const token = this.extractJwtFromHeader(request);
+
     if (!token)
       throw new BadRequestException({
         message: 'Authorization is required. Expected: Bearer authorization.',
@@ -52,6 +53,7 @@ export class AuthGuard implements CanActivate {
   }
   private extractJwtFromHeader(request: Request): string | undefined {
     const [bearer, token] = request.headers.authorization?.split(' ') ?? [];
-    return bearer !== 'Bearer' || token ? undefined : token;
+
+    return bearer !== 'Bearer' || !token ? undefined : token;
   }
 }
