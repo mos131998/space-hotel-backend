@@ -15,7 +15,7 @@ enum Role {
 
 enum PaymentStatus {
   PENDING
-
+  FAILED
   APPROVED
 }
 
@@ -35,19 +35,20 @@ model User {
 }
 
 model Room {
-  id          Int          @id @default(autoincrement())
-  roomNumber  Int          @unique
-  price       Int
-  roomName    String
-  size        Int
-  maxAdult    Int
-  maxChildren Int
-  bathRoom    Boolean
-  bathTup     Boolean
-  createdAt   DateTime     @default(now()) @map("created_at") @db.Timestamptz()
-  updated_At  DateTime     @default(now()) @map("updated_at") @db.Timestamptz()
-  roomImages  roomImages[]
-  bookings    Booking[]
+  id            Int          @id @default(autoincrement())
+  roomNumber    Int          @unique
+  price         Int
+  roomName      String
+  size          Int
+  maxAdult      Int
+  maxChildren   Int
+  maxtotalhuman Int
+  bathRoom      Boolean
+  bathTup       Boolean
+  createdAt     DateTime     @default(now()) @map("created_at") @db.Timestamptz()
+  updated_At    DateTime     @updatedAt
+  roomImages    roomImages[]
+  bookings      Booking[]
 }
 
 model roomImages {
@@ -64,11 +65,13 @@ model Booking {
   user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   roomId        Int
   room          Room          @relation(fields: [roomId], references: [id], onDelete: Cascade)
-  checkIn       DateTime      @default(now())
-  checkOut      DateTime      @default(now())
+  checkIn       DateTime
+  checkOut      DateTime
+  totalhuman    Int
   paymentStatus PaymentStatus
-  total         Int
+  total         Decimal       @db.Decimal(10, 2)
+  discount      Decimal       @db.Decimal(10, 2)
   slipUrl       String
   created_At    DateTime      @default(now()) @map("created_at") @db.Timestamptz()
-  updated_At    DateTime      @default(now()) @map("updated_at") @db.Timestamptz()
+  updated_At    DateTime      @updatedAt
 }
