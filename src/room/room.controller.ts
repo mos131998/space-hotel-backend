@@ -46,6 +46,7 @@ export class RoomController {
     return this.roomService.update(Number(id), updateRoomDto);
   }
 
+  @Roles('Admin')
   @Delete(':id')
   deleteRoom(@Param('id') id: string) {
     return this.roomService.delete(Number(id));

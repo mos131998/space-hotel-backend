@@ -9,19 +9,23 @@ import { PrismaService } from 'src/database/prisma.service';
 import { BcryptService } from 'src/shared/security/services/bcrypt.service';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/client';
 import { UserWithOutPassword } from './types/user.tpye';
+import { Role } from 'src/database/generated/prisma/enums';
+import { TypedConfigService } from 'src/config/typed-config.service';
 
 @Injectable()
 export class UserService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly bcryptService: BcryptService
+    private readonly bcryptService: BcryptService,
+    private readonly typedConfigService: TypedConfigService
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     const hashPassword = await this.bcryptService.hash(createUserDto.password);
+    const role = this.isAdminEmail(createUserDto.email) ? Role.Admin : Role.User;
     try {
       const user = await this.prisma.user.create({
-        data: { ...createUserDto, password: hashPassword }
+        data: { ...createUserDto, password: hashPassword, role }
       });
       return user;
     } catch (error) {
@@ -53,5 +57,15 @@ export class UserService {
       });
 
     return user;
+  }
+
+  private isAdminEmail(email: string): boolean {
+    const adminEmails = this.typedConfigService.get('ADMIN_EMAILS');
+    if (!adminEmails) return false;
+
+    return adminEmails
+      .split(',')
+      .map((adminEmail) => adminEmail.trim().toLowerCase())
+      .includes(email.trim().toLowerCase());
   }
 }

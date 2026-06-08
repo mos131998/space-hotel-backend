@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma.service';
 import { CreateBookingDto } from './dtos/create-booking.dto';
+import { PAYMENT_DEFAULT, PAYMENT_FLOW } from './constants/payment.constants';
 
 @Injectable()
 export class BookingService {
@@ -20,15 +21,28 @@ export class BookingService {
 
     const checkIn = new Date(dto.checkIn);
     const checkOut = new Date(dto.checkOut);
-    const conFlict = await this.prismaService.booking.findFirst({
+
+    if (checkOut <= checkIn) {
+      throw new BadRequestException(
+        'Check-out date must be after check-in date'
+      );
+    }
+
+    if (dto.totalhuman > room.maxtotalhuman) {
+      throw new BadRequestException('Guest count exceeds room capacity');
+    }
+
+    const conflict = await this.prismaService.booking.findFirst({
       where: {
         roomId: dto.roomId,
-        paymentStatus: { not: 'FAILED' },
+        paymentStatus: { not: PAYMENT_FLOW.FAILURE_STATUS },
         AND: [{ checkIn: { lt: checkOut } }, { checkOut: { gt: checkIn } }]
       }
     });
-    if (conFlict) {
-      throw new BadRequestException('ห้องนี้มีการจองในช่วงเวลานี้เเล้ว');
+    if (conflict) {
+      throw new BadRequestException(
+        'This room is already booked for the selected dates'
+      );
     }
 
     const days = Math.ceil(
@@ -44,9 +58,9 @@ export class BookingService {
         checkOut,
         totalhuman: dto.totalhuman,
         total,
-        discount: 0,
-        paymentStatus: 'PENDING',
-        slipUrl: ''
+        discount: PAYMENT_DEFAULT.DISCOUNT,
+        paymentStatus: PAYMENT_FLOW.DEFAULT_STATUS,
+        slipUrl: PAYMENT_DEFAULT.SLIP_URL
       }
     });
   }
@@ -54,7 +68,20 @@ export class BookingService {
   async findMyBookings(userId: number) {
     return this.prismaService.booking.findMany({
       where: { userId },
-      include: { room: true }
+      include: {
+        room: { include: { roomImages: { orderBy: { id: 'asc' } } } }
+      },
+      orderBy: { created_At: 'desc' }
+    });
+  }
+
+  async findAll() {
+    return this.prismaService.booking.findMany({
+      include: {
+        user: true,
+        room: { include: { roomImages: { orderBy: { id: 'asc' } } } }
+      },
+      orderBy: { created_At: 'desc' }
     });
   }
 }

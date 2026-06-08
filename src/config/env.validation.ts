@@ -6,7 +6,10 @@ const envSchema = z.object({
   DATABASE_URL: z.url(),
   SALT_ROUNDS: z.coerce.number().int().min(10),
   JWT_SECRET: z.string().min(32),
-  JWT_EXPIRES_IN: z.coerce.number().int().positive()
+  JWT_EXPIRES_IN: z.coerce.number().int().positive(),
+  ADMIN_EMAILS: z.string().optional(),
+  PAYMENT_CURRENCY: z.string().min(3).max(3),
+  PAYMENT_REVIEW_EXPIRES_HOURS: z.coerce.number().int().positive()
 });
 
 export type EnvConfigType = z.infer<typeof envSchema>;
